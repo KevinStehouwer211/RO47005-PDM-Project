@@ -30,7 +30,7 @@ class CustomCtrlAviary(CtrlAviary):
         Override BaseAviary._addObstacles().
         Adds the maze obstacles and visualizes their bounding spheres.
         """
-        self.obstacle_ids = []
+        self. obstacle_ids = []
 
         # Load the entire maze at once
         script_dir = os.path.dirname(os.path.abspath(__file__))
