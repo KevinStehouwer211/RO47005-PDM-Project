@@ -27,7 +27,7 @@ https://github.com/utiasDSL/gym-pybullet-drones
 
   </td>
   <td style="vertical-align: middle; padding-left: 20px;">
-    <img src="images/TUDelft.png" alt="TU Delft" width="180"/>
+    <img src="PDM_project/images/TUDelft.png" alt="TU Delft" height="180"/>
   </td>
   </tr>
 </table>
@@ -36,19 +36,25 @@ https://github.com/utiasDSL/gym-pybullet-drones
 
 ## About
 
-This repository contains a complete path planning pipeline for group 34 of the RO47005 'Planning and Dicision Making' course project. The objective of the project is to autonomously navigate a quadrotor from a start location (A) to a goal location (B) in a three-dimensional environment containing static obstacles, by computing and tracking a collision-free trajectory.
+This repository contains a complete path planning pipeline for group 34 of the RO47005 'Planning and Dicision Making' course project. The objective of the project is to autonomously navigate a quadrotor from a start location (A) to a goal location (B) in a three-dimensional environment containing static obstacles, by computing and tracking a collision-free trajectory. See figure 1 for a demo:
 
-![Pipeline_demo](images/Pipeline.gif)
+<p align="center">
+  <img src="PDM_project/images/Pipeline_demo.gif" width="500">
+  <br>
+  <em>Figure 1: Global path planning using RRT* (left) and local trajectory tracking with MPC (right).</em>
+</p>
 
- This repository extends and builds upon the forked repository `gym_pybullet_drones` which includes the base of the environent and quadrotor dynamics. Furthermore, for the objective stated above, the incremental sampling-based method Rapidly-exploring Random Tree (`RRT.py`) will be used for global path planning, since it performs well in high-dimensional configuration spaces and provides asymptotic optimality and probabilistic completeness as the number of iterations approaches infinity, meaning that the probability of finding a feasible path approaches one if such a path exists, and that the cost of the solution converges to the optimal solution over time. 
 
- ![Collision-free trajectory](images/RRT.png)
+ This repository extends and builds upon the forked repository `gym_pybullet_drones` which includes the base of the environent and quadrotor dynamics. Furthermore, for the objective stated above, the incremental sampling-based method Rapidly-exploring Random Tree (`RRT.py`, figure 2) will be used for global path planning, since it performs well in high-dimensional configuration spaces and provides asymptotic optimality and probabilistic completeness as the number of iterations approaches infinity, meaning that the probability of finding a feasible path approaches one if such a path exists, and that the cost of the solution converges to the optimal solution over time. However, for this project, a variant of RRT* has been used to speed up the path planning process by returning the first feasible path found. By doing this, as the number of iterations approaches infinity, the probability of finding a feasible path still approaches one if such a path exists but, the cost of the solution does not converge to the optimal solution over time since it does not update the path after finding the first feasible solution. In addition, Model Predictive Control (`MPC.py`, figure 2) will be used for local path planning, as it enables to avoid encountered obstacles during flight. MPC plans over a finite prediction horizon, explicitly handles constraints, and recomputes the control inputs at each time step based on updated state information, meaning that it is perfectly suited for the objective. 
  
- In addition, Model Predictive Control (`MPC.py`) will be used for local path planning, as it enables to avoid encountered obstacles during flight. MPC plans over a finite prediction horizon, explicitly handles constraints, and recomputes the control inputs at each time step based on updated state information, meaning that it is perfectly suited for the objective. 
+<p align="center">
+  <img src="PDM_project/images/RRT.png" height="300">
+  <img src="PDM_project/images/MPC_demo.gif" height="300">
+  <br>
+  <em>Figure 2: Global path planning using RRT* (left) and local trajectory tracking with MPC (right).</em>
+</p>
  
- ![MPC_demo](images/MPC_demo.gif)
- 
- The environment has been extended by placing obstacles which the quadrotor has to avoid in `env.py`. Finally, to combine the methods in a complete pipeline, `main.py` has been developed.
+ The environment of py-bullet-drones has been extended by placing obstacles which the quadrotor has to avoid in `env.py`. Finally, to combine the methods in a complete pipeline, `main.py` has been developed.
 
 ---
 
