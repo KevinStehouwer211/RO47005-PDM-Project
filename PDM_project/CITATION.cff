@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "Citation for the RRT*-MPC extensions developed for the TU Delft RO47005 course."
+
+title: "RRT*-MPC Motion Planning for Quadrotor Navigation"
+year: 2026
+
+authors:
+  - family-names: "Pigliapoco"
+    given-names: "Simone"
+  - family-names: "Calzolari"
+    given-names: "Tommaso"
+  - family-names: "Pedretti"
+    given-names: "Leonardo"
+  - family-names: "Stehouwer"
+    given-names: "Kevin"
+
+references:
+  - type: article
+    title: "Learning to Fly—A Gym Environment with PyBullet Physics for Reinforcement Learning of Multi-agent Quadcopter Control"
+    year: 2021
