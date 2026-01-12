@@ -204,47 +204,6 @@ class MPC_control(BaseControl):
     
 
     # 2. CONSTRAINT UPDATES (OBSTACLES)
-    '''
-    def update_param(self, cur_pos, r_drone, obstacles_center, r_obs):
-        """
-        Updates the linear constraints (A x <= b) based on the current drone position
-        relative to obstacles.
-        """
-        # Guard clause for 0 obstacles
-        if self.num_halfspaces > 0:
-            A, b = self.convex_region(
-                cur_pos=cur_pos,
-                r_drone=r_drone,
-                obstacle_list=obstacles_center,
-                r_obstacle_list=r_obs,
-                wall_list=self.static_walls
-            )
-        
-            # Enforce fixed size for CVXPY Parameters (Padding/Truncating)
-            K = self.num_halfspaces
-
-            if A.shape[0] < K:
-                # Pad with non-binding constraints
-                missing = K - A.shape[0]
-                A_pad = np.zeros((missing, 3))
-                b_pad = 1e6 * np.ones(missing)  # always satisfied: 0*x <= 1e6
-                A = np.vstack([A, A_pad])
-                b = np.hstack([b, b_pad])
-
-            elif A.shape[0] > K:
-                # Truncate if we have too many (shouldn't happen with current logic)
-                A = A[:K, :]
-                b = b[:K]
-
-            # Store for plotting/debug
-            self.last_A = A.copy()
-            self.last_b = b.copy()
-
-            # Update CVXPY parameters
-            self.A_param.value = A
-            self.b_param.value = b
-
-    '''
     def update_param(self, cur_pos, r_drone, obstacles_center, r_obs):
         """
         Updates constraints by filtering for only the nearest obstacles 
