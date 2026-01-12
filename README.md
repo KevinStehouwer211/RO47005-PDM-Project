@@ -1,23 +1,29 @@
-> [!TIP]
-> For **symbolic dynamics and constraints**, also try our [`safe-control-gym`](https://github.com/utiasDSL/safe-control-gym)
->
-> For **ROS2, PX4, ArduPilot, YOLO, and LiDAR**, also try our [`aerial-autonomy-stack`](https://github.com/JacopoPan/aerial-autonomy-stack)
+# RO47005 Planning and Dicision Making Project
 
-# gym-pybullet-drones
+## Contributors
 
-This is a minimalist refactoring of the original `gym-pybullet-drones` repository, designed for compatibility with [`gymnasium`](https://github.com/Farama-Foundation/Gymnasium), [`stable-baselines3` 2.0](https://github.com/DLR-RM/stable-baselines3/pull/1327), and [`betaflight`](https://github.com/betaflight/betaflight)/[`crazyflie-firmware`](https://github.com/bitcraze/crazyflie-firmware/) SITL.
+| Name              | NetID       | Student Number   | group |Date        |
+|-------------------|-------------|------------------|-------|------------|
+| Simone Pigliapoco | spigliapoco | 6403344          | 34    | 12/01/2026 |
+| Tommaso Calzolari | tcalzolari  | 6430600          |       |            |
+| Leonardo Pedretti | lpedretti   | 6432891          |       |            |
+| Kevin Stehouwer   | kstehouwer  | 6304915          |       |            |
 
-> **NOTE**: if you want to access the original codebase, presented at IROS in 2021, please `git checkout [paper|master]`
 
-<img src="gym_pybullet_drones/assets/helix.gif" alt="formation flight" width="325"> <img src="gym_pybullet_drones/assets/helix.png" alt="control info" width="425">
+---
 
-## Installation
+## About
 
-Tested on Intel x64/Ubuntu 22.04 and Apple Silicon/macOS 14.1.
+This repository contains a complete path planning pipeline for group 34 of the RO47005 'Planning and Dicision Making' course project. The objective of the project is to autonomously navigate a quadrotor from a start location (A) to a goal location (B) in a three-dimensional environment containing static obstacles, by computing and tracking a collision-free trajectory. This repository extends and builds upon the forked repository `gym_pybullet_drones` which includes the base of the environent and quadrotor dynamics. Furthermore, for the objective stated above, the incremental sampling-based method Rapidly-exploring Random Tree (`RRT.py`) will be used for global path planning, since it performs well in high-dimensional configuration spaces and provides asymptotic optimality and probabilistic completeness as the number of iterations approaches infinity, meaning that the probability of finding a feasible path approaches one if such a path exists, and that the cost of the solution converges to the optimal solution over time. In addition, Model Predictive Control (`MPC.py`) will be used for local path planning, as it enables to avoid encountered obstacles during flight. MPC plans over a finite prediction horizon, explicitly handles constraints, and recomputes the control inputs at each time step based on updated state information, meaning that it is perfectly suited for the objective. The environment has been extended by placing obstacles which the quadrotor has to avoid in `env.py`. Finally, to combine the methods in a complete pipeline, `main.py` has been developed.
 
+---
+
+## Installation 
+
+To install the repository, including `gym_pybullet_drones` and the path planning files, find a place in your directory to store it and enter the following commands in your terminal:
 ```sh
-git clone https://github.com/utiasDSL/gym-pybullet-drones.git
-cd gym-pybullet-drones/
+git clone https://github.com/KevinStehouwer211/RO47005-PDM-Project.git
+cd RO47005-PDM-Project/
 
 conda create -n drones python=3.10
 conda activate drones
@@ -28,90 +34,23 @@ pip3 install -e . # if needed, `sudo apt install build-essential` to install `gc
 # check installed packages with `conda list`, deactivate with `conda deactivate`, remove with `conda remove -n drones --all`
 ```
 
-## Use
+---
 
-### PID control examples
+## Run path planning pipeline 
 
-```sh
-cd gym_pybullet_drones/examples/
-python3 pid.py # position and velocity reference
-python3 pid_velocity.py # desired velocity reference
-```
-
-### Downwash effect example
-
-```sh
-cd gym_pybullet_drones/examples/
-python3 downwash.py
-```
-
-### Reinforcement learning examples (SB3's PPO)
-
-```sh
-cd gym_pybullet_drones/examples/
-python learn.py # task: single drone hover at z == 1.0
-python learn.py --multiagent true # task: 2-drone hover at z == 1.2 and 0.7
-LATEST_MODEL=$(ls -t results | head -n 1) && python play.py --model_path "results/${LATEST_MODEL}/best_model.zip" # play and visualize the most recent learned policy after training
-```
-
-<img src="gym_pybullet_drones/assets/rl.gif" alt="rl example" width="375"> <img src="gym_pybullet_drones/assets/marl.gif" alt="marl example" width="375">
-
-### Run all tests
-
-```sh
-# from the repo's top folder
-cd gym-pybullet-drones/
-pytest tests/
-```
-
-### utiasDSL `pycffirmware` Python Bindings example (multiplatform, single-drone)
-
-Install [`pycffirmware`](https://github.com/utiasDSL/pycffirmware?tab=readme-ov-file#installation) for Ubuntu, macOS, or Windows
-
-```sh
-cd gym_pybullet_drones/examples/
-python3 cff-dsl.py
-```
-
-### Betaflight SITL example (Ubuntu only)
-
-```sh
-git clone https://github.com/betaflight/betaflight 
-cd betaflight/
-git checkout cafe727 # `master` branch head at the time of writing (future release 4.5)
-make arm_sdk_install # if needed, `apt install curl``
-make TARGET=SITL # comment out line: https://github.com/betaflight/betaflight/blob/master/src/main/main.c#L52
-cp ~/gym-pybullet-drones/gym_pybullet_drones/assets/eeprom.bin ~/betaflight/ # assuming both gym-pybullet-drones/ and betaflight/ were cloned in ~/
-betaflight/obj/main/betaflight_SITL.elf
-```
-
-In another terminal, run the example
-
+once everything is set up, you can run the path planning pipeline of the quadrotor by using the following command in the terminal:
 ```sh
 conda activate drones
-cd gym_pybullet_drones/examples/
-python3 beta.py --num_drones 1 # check the steps in the file's docstrings to use multiple drones
+cd PDM_project/
+python3 main.py
 ```
 
-## Citation
+Initially, the script will attempt to find a feasible path which will navigate to the goal position without collisions and errors recarding the quadrotors dynamics. Eventually, after finding a feasible path, you should be able to see the simulation environment including the quadrotor. A red and green line have been displayed which represent the offline planned RRT* path and smoothened spline path after applying quadrotor dynamics. While tracking the offline computed RRT* path, the quadrotor will encounter randomly placed obstacles on its path which it will have to avoid by using online MPC obstacle avoidance while remaining as close as possible to the planned path. After reaching the goal, the script will output graphs which demonstrate data and actions taken by the quadrotor.
 
-If you wish, please cite our [IROS 2021 paper](https://arxiv.org/abs/2103.02142) ([and original codebase](https://github.com/utiasDSL/gym-pybullet-drones/tree/paper)) as
-
-```bibtex
-@INPROCEEDINGS{panerati2021learning,
-      title={Learning to Fly---a Gym Environment with PyBullet Physics for Reinforcement Learning of Multi-agent Quadcopter Control}, 
-      author={Jacopo Panerati and Hehui Zheng and SiQi Zhou and James Xu and Amanda Prorok and Angela P. Schoellig},
-      booktitle={2021 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)},
-      year={2021},
-      volume={},
-      number={},
-      pages={7512-7519},
-      doi={10.1109/IROS51168.2021.9635857}
-}
-```
+--- 
 
 ## References
-
+- Panerati, J., Zheng, H., Zhou, S., Xu, J., Prorok, A., & Schoellig, A. P. (2021). Learning to Fly---a Gym Environment with PyBullet Physics for Reinforcement Learning of Multi-agent Quadcopter Control. 2021 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS), 1(1), 1–8. https://doi.org/10.0000/00000
 - Erwin Coumans and Yunfei Bai (2023) [*PyBullet Quickstart Guide*](https://docs.google.com/document/d/10sXEhzFRSnvFcl3XxNGhnD4N2SedqwdAvK3dsihxVUA/edit?tab=t.0#heading=h.2ye70wns7io3)
 - Carlos Luis and Jeroome Le Ny (2016) [*Design of a Trajectory Tracking Controller for a Nanoquadcopter*](https://arxiv.org/pdf/1608.05786.pdf)
 - Nathan Michael, Daniel Mellinger, Quentin Lindsey, Vijay Kumar (2010) [*The GRASP Multiple Micro-UAV Testbed*](https://ieeexplore.ieee.org/document/5569026)
